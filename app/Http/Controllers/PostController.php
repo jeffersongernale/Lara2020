@@ -8,17 +8,17 @@ class PostController extends Controller
 {
     //
     
-    public function __contstruct(){
+   
 
-    }
-
-    public function index(){
-        $posts= Post::paginate(20);
+    public function index()
+    {
+        $posts= Post::latest()->with(['user', 'likes'])->paginate(20);
         return view('posts.index',['posts'=>$posts]);
     }
-
+ 
     public function store(Request $request)
     {
+        // return $request->user();
         $this->validate($request,[
             'body' => 'required'
         ]);
@@ -28,5 +28,19 @@ class PostController extends Controller
         ]);
 
         return back();
+    }
+
+    public function destroy(Post $post,Request $request){
+    //   dd($post);
+        $this->authorize('delete',$post);
+        $post->delete();
+        return back();
+    }
+
+    public function show(Post $post)
+    {
+        return view('posts.show', [
+            'post' => $post
+        ]);
     }
 }
